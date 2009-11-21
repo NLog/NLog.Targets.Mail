@@ -95,32 +95,38 @@ namespace NLog.Targets
         /// <summary>
         /// Gets or sets sender's email address (e.g. joe@domain.com).
         /// </summary>
+        /// <docgen category="E-mail addresses" order="0" />
         public Layout From { get; set; }
 
         /// <summary>
         /// Gets or sets recipients' email addresses separated by semicolons (e.g. john@domain.com;jane@domain.com).
         /// </summary>
+        /// <docgen category="E-mail addresses" order="1" />
         public Layout To { get; set; }
 
         /// <summary>
         /// Gets or sets CC email addresses separated by semicolons (e.g. john@domain.com;jane@domain.com).
         /// </summary>
+        /// <docgen category="E-mail addresses" order="2" />
         public Layout CC { get; set; }
 
         /// <summary>
         /// Gets or sets BCC email addresses separated by semicolons (e.g. john@domain.com;jane@domain.com).
         /// </summary>
+        /// <docgen category="E-mail addresses" order="3" />
         public Layout Bcc { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to add new lines between log entries.
         /// </summary>
         /// <value>A value of <c>true</c> if new lines should be added; otherwise, <c>false</c>.</value>
+        /// <docgen category="Layout" order="10" />
         public bool AddNewLines { get; set; }
 
         /// <summary>
         /// Gets or sets the mail subject.
         /// </summary>
+        /// <docgen category="Layout" order="3" />
         [DefaultValue("Message from NLog on ${machinename}")]
         public Layout Subject { get; set; }
 
@@ -128,6 +134,7 @@ namespace NLog.Targets
         /// Gets or sets mail message body (repeated for each log message send in one mail).
         /// </summary>
         /// <remarks>Alias for <see cref="Layout"/> property.</remarks>
+        /// <docgen category="Layout" order="4" />
         [DefaultValue("${message}")]
         public Layout Body
         {
@@ -138,34 +145,40 @@ namespace NLog.Targets
         /// <summary>
         /// Gets or sets encoding to be used for sending e-mail.
         /// </summary>
+        /// <docgen category="Layout" order="8" />
         [DefaultValue("UTF8")]
         public Encoding Encoding { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to send message as HTML instead of plain text.
         /// </summary>
+        /// <docgen category="Layout" order="9" />
         [DefaultValue(false)]
         public bool Html { get; set; }
-        
+
         /// <summary>
         /// Gets or sets SMTP Server to be used for sending.
         /// </summary>
+        /// <docgen category="Server Parameters" order="0" />
         public Layout SmtpServer { get; set; }
 
         /// <summary>
         /// Gets or sets SMTP Authentication mode.
         /// </summary>
+        /// <docgen category="Server Parameters" order="1" />
         [DefaultValue("None")]
         public SmtpAuthenticationMode SmtpAuthentication { get; set; }
 
         /// <summary>
         /// Gets or sets the username used to connect to SMTP server (used when SmtpAuthentication is set to "basic").
         /// </summary>
+        /// <docgen category="Server Parameters" order="2" />
         public Layout SmtpUsername { get; set; }
 
         /// <summary>
         /// Gets or sets the password used to authenticate against SMTP server (used when SmtpAuthentication is set to "basic").
         /// </summary>
+        /// <docgen category="Server Parameters" order="2" />
         public Layout SmtpPassword { get; set; }
 
         /// <summary>
@@ -177,6 +190,7 @@ namespace NLog.Targets
         /// <summary>
         /// Gets or sets the port number that SMTP Server is listening on.
         /// </summary>
+        /// <docgen category="Server Parameters" order="3" />
         [DefaultValue(25)]
         public int SmtpPort { get; set; }
 
