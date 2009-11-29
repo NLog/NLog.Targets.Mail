@@ -120,13 +120,13 @@ namespace NLog.Targets
         /// Gets or sets a value indicating whether to add new lines between log entries.
         /// </summary>
         /// <value>A value of <c>true</c> if new lines should be added; otherwise, <c>false</c>.</value>
-        /// <docgen category="Layout" order="10" />
+        /// <docgen category="Layout Options" order="10" />
         public bool AddNewLines { get; set; }
 
         /// <summary>
         /// Gets or sets the mail subject.
         /// </summary>
-        /// <docgen category="Layout" order="3" />
+        /// <docgen category="Layout Options" order="3" />
         [DefaultValue("Message from NLog on ${machinename}")]
         public Layout Subject { get; set; }
 
@@ -134,7 +134,7 @@ namespace NLog.Targets
         /// Gets or sets mail message body (repeated for each log message send in one mail).
         /// </summary>
         /// <remarks>Alias for <see cref="Layout"/> property.</remarks>
-        /// <docgen category="Layout" order="4" />
+        /// <docgen category="Layout Options" order="4" />
         [DefaultValue("${message}")]
         public Layout Body
         {
@@ -145,14 +145,14 @@ namespace NLog.Targets
         /// <summary>
         /// Gets or sets encoding to be used for sending e-mail.
         /// </summary>
-        /// <docgen category="Layout" order="8" />
+        /// <docgen category="Layout Options" order="8" />
         [DefaultValue("UTF8")]
         public Encoding Encoding { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to send message as HTML instead of plain text.
         /// </summary>
-        /// <docgen category="Layout" order="9" />
+        /// <docgen category="Layout Options" order="9" />
         [DefaultValue(false)]
         public bool Html { get; set; }
 
