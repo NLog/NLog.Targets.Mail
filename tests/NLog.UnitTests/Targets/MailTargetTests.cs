@@ -44,7 +44,7 @@ namespace NLog.UnitTests.Targets
     using NLog.Layouts;
     using NLog.Targets;
     using Xunit;
-	using System.IO;
+	  using System.IO;
 
     public class MailTargetTests : NLogTestBase
     {
