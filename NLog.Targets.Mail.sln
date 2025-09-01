@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.Mail", "src\NLog.Targets.Mail\NLog.Targets.Mail.csproj", "{930F2F4D-CC41-CCD7-9340-D9169B3E77FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLog.Targets.Mail.Tests", "tests\NLog.Targets.Mail.Tests\NLog.Targets.Mail.Tests.csproj", "{359E8025-165C-558C-4558-10CA6C33F709}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{930F2F4D-CC41-CCD7-9340-D9169B3E77FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{930F2F4D-CC41-CCD7-9340-D9169B3E77FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{930F2F4D-CC41-CCD7-9340-D9169B3E77FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{930F2F4D-CC41-CCD7-9340-D9169B3E77FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{359E8025-165C-558C-4558-10CA6C33F709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{359E8025-165C-558C-4558-10CA6C33F709}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{359E8025-165C-558C-4558-10CA6C33F709}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{359E8025-165C-558C-4558-10CA6C33F709}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF70DFF0-0860-4C39-BA9B-17D4DA8F3EDF}
+	EndGlobalSection
+EndGlobal
