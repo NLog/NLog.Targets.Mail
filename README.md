@@ -1,5 +1,8 @@
 # NLog Mail Target
 
+[![Version](https://badge.fury.io/nu/NLog.Targets.Mail.svg)](https://www.nuget.org/packages/NLog.Targets.Mail)
+[![AppVeyor](https://img.shields.io/appveyor/ci/nlog/NLog-Targets-Mail/master.svg)](https://ci.appveyor.com/project/nlog/NLog-Targets-Mail/branch/master)
+
 NLog Mail Target for sending email using .NET SmtpClient for each logevent.
 
 If having trouble with output, then check [NLog InternalLogger](https://github.com/NLog/NLog/wiki/Internal-Logging) for clues. See also [Troubleshooting NLog](https://github.com/NLog/NLog/wiki/Logging-Troubleshooting)
