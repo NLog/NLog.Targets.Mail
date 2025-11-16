@@ -4,9 +4,10 @@
 [![AppVeyor](https://img.shields.io/appveyor/ci/nlog/NLog-Targets-Mail/master.svg)](https://ci.appveyor.com/project/nlog/NLog-Targets-Mail/branch/master)
 
 NLog Mail Target for sending email using .NET SmtpClient for each logevent.
+- Can also be combined with [FallbackGroup](https://github.com/NLog/NLog/wiki/FallbackGroup-target) to fallback to alternative SMTP-server on error.
 - Can also be combined with [BufferingWrapper](https://github.com/nlog/NLog/wiki/BufferingWrapper-target) to group multiple logevents into a single email.
 - Can also be combined with [LimitingWrapper](https://github.com/NLog/NLog/wiki/LimitingWrapper-target) to throttle the number of emails.
-- Can also be combined with [FilteringWrapper](https://github.com/NLog/NLog/wiki/FilteringWrapper-target) to avoid repeating identical emails. 
+- Can also be combined with [FilteringWrapper](https://github.com/NLog/NLog/wiki/FilteringWrapper-target) to avoid repeating identical emails.
 
 If having trouble with output, then check [NLog InternalLogger](https://github.com/NLog/NLog/wiki/Internal-Logging) for clues. See also [Troubleshooting NLog](https://github.com/NLog/NLog/wiki/Logging-Troubleshooting)
 
