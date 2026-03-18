@@ -343,8 +343,33 @@ namespace NLog.Targets
         protected override void InitializeTarget()
         {
             CheckRequiredParameters();
-
+            ValidateFixedEmailAddress(From, nameof(From));
+            ValidateFixedEmailAddress(To, nameof(To));
+            ValidateFixedEmailAddress(CC, nameof(CC));
+            ValidateFixedEmailAddress(Bcc, nameof(Bcc));
             base.InitializeTarget();
+        }
+
+        private void ValidateFixedEmailAddress(Layout emailAddress, string emailAddressType)
+        {
+            if (!ReferenceEquals(emailAddress, Layout.Empty) && emailAddress is SimpleLayout simpleLayout && simpleLayout.IsFixedText)
+            {
+                var mailAddressCollection = new MailAddressCollection();
+                try
+                {
+                    if (!AddAddresses(mailAddressCollection, emailAddress, LogEventInfo.CreateNullEvent(), allowThrow: true))
+                        throw new NLogConfigurationException(string.Format(RequiredPropertyIsEmptyFormat, emailAddressType));
+                }
+                catch (NLogConfigurationException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    var nlogConfigException = new NLogConfigurationException($"MailTarget: Invalid {emailAddressType}-email-address: {simpleLayout.FixedText}", ex);
+                    throw nlogConfigException;
+                }
+            }
         }
 
         /// <summary>
@@ -526,25 +551,30 @@ namespace NLog.Targets
 
         private void CheckRequiredParameters()
         {
-            if (To is null || ReferenceEquals(To, Layout.Empty))
-            {
-                throw new NLogConfigurationException($"MailTarget '{nameof(To)}'-property must be assigned. Destination To-address required for email.");
-            }
-
-            if (From is null || ReferenceEquals(From, Layout.Empty))
+            if (IsEmptyLayout(From))
             {
                 throw new NLogConfigurationException($"MailTarget '{nameof(From)}'-property must be assigned. Sender From-address required for email.");
             }
 
-            if (!UseSystemNetMailSettings && DeliveryMethod == SmtpDeliveryMethod.Network && (SmtpServer is null || ReferenceEquals(SmtpServer, Layout.Empty)))
+            if (IsEmptyLayout(To) && IsEmptyLayout(CC) && IsEmptyLayout(Bcc))
+            {
+                throw new NLogConfigurationException($"MailTarget '{nameof(To)}'-property must be assigned. Destination To-address required for email.");
+            }
+
+            if (!UseSystemNetMailSettings && DeliveryMethod == SmtpDeliveryMethod.Network && IsEmptyLayout(SmtpServer))
             {
                 throw new NLogConfigurationException($"MailTarget '{nameof(SmtpServer)}'-property must be assigned. Required because useSystemNetMailSettings=false and DeliveryMethod=Network.");
             }
 
-            if (!UseSystemNetMailSettings && DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && (PickupDirectoryLocation is null || ReferenceEquals(PickupDirectoryLocation, Layout.Empty)))
+            if (!UseSystemNetMailSettings && DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && IsEmptyLayout(PickupDirectoryLocation))
             {
                 throw new NLogConfigurationException($"MailTarget '{nameof(PickupDirectoryLocation)}'-property must be assigned. Required because useSystemNetMailSettings=false and DeliveryMethod=SpecifiedPickupDirectory.");
             }
+        }
+
+        private static bool IsEmptyLayout(Layout? layout)
+        {
+            return layout is null || ReferenceEquals(layout, Layout.Empty);
         }
 
         /// <summary>
@@ -622,8 +652,9 @@ namespace NLog.Targets
         /// <param name="mailAddressCollection">Addresses appended to this list</param>
         /// <param name="layout">layout with addresses, ; separated</param>
         /// <param name="logEvent">event for rendering the <paramref name="layout"/></param>
+        /// <param name="allowThrow">Abort early when invalid email address format</param>
         /// <returns>added a address?</returns>
-        private bool AddAddresses(MailAddressCollection mailAddressCollection, Layout layout, LogEventInfo logEvent)
+        private bool AddAddresses(MailAddressCollection mailAddressCollection, Layout layout, LogEventInfo logEvent, bool allowThrow = false)
         {
             var added = false;
             var mailAddresses = RenderLogEvent(layout, logEvent);
@@ -636,8 +667,17 @@ namespace NLog.Targets
                     if (string.IsNullOrEmpty(mailAddress))
                         continue;
 
-                    mailAddressCollection.Add(mailAddress);
-                    added = true;
+                    try
+                    {
+                        mailAddressCollection.Add(mailAddress);
+                        added = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        InternalLogger.Error(ex, "{0}: Invalid email address: {1}", this, mailAddress);
+                        if (allowThrow || LogManager.ThrowExceptions)
+                            throw;
+                    }
                 }
             }
 
