@@ -606,6 +606,50 @@ namespace NLog.Targets.Mail
         }
 
         [Fact]
+        public void MailTarget_WithBlankTo_ThrowsConfigException()
+        {
+            var mmt = new MockMailTarget
+            {
+                From = "foo@bar.com",
+                To = " ",
+                Subject = "Hello from NLog",
+                SmtpServer = "server1",
+                SmtpPort = 27,
+                Body = "${level} ${logger} ${message}",
+            };
+
+            Assert.Throws<NLogConfigurationException>(() =>
+                new LogFactory().Setup().LoadConfiguration(cfg =>
+                {
+                    cfg.LogFactory.ThrowConfigExceptions = true;
+                    cfg.Configuration.AddRuleForAllLevels(mmt);
+                })
+            );
+        }
+
+        [Fact]
+        public void MailTarget_WithInvalidTo_ThrowsConfigException()
+        {
+            var mmt = new MockMailTarget
+            {
+                From = "foo@bar.com",
+                To = "@",
+                Subject = "Hello from NLog",
+                SmtpServer = "server1",
+                SmtpPort = 27,
+                Body = "${level} ${logger} ${message}",
+            };
+
+            Assert.Throws<NLogConfigurationException>(() =>
+                new LogFactory().Setup().LoadConfiguration(cfg =>
+                {
+                    cfg.LogFactory.ThrowConfigExceptions = true;
+                    cfg.Configuration.AddRuleForAllLevels(mmt);
+                })
+            );
+        }
+
+        [Fact]
         public void MailTarget_WithEmptyFrom_ThrowsConfigException()
         {
             var mmt = new MockMailTarget
