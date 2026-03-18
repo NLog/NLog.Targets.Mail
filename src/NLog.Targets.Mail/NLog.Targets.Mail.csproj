@@ -5,7 +5,7 @@
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '17.0' ">net35;net46;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net35;net46;netstandard2.0;netstandard2.1</TargetFrameworks>
 
-    <VersionPrefix>6.0.3</VersionPrefix>
+    <VersionPrefix>6.1.1</VersionPrefix>
     <AssemblyVersion>6.0.0.0</AssemblyVersion>
     <!-- Strong AssemblyVersion must be fixed on 6.0.0.0 -->
     <AppVeyorBuildNumber>$(APPVEYOR_BUILD_NUMBER)</AppVeyorBuildNumber>
@@ -22,8 +22,16 @@
     <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>
 
     <PackageReleaseNotes>
-      MailTarget Docs:
-      https://github.com/nlog/NLog/wiki/Mail-target
+Changelog:
+- First release after extracting to own git repository.
+- Improved upfront validation of configured email addresses (To / From / Cc / Bcc)
+- Improved exception handling when one or more configured email addresses are not valid.
+- Improved Assembly Title to include target framework details.
+- Updated nuget-package README.md to include more links to wiki-documentation.
+- Update to NLog ver. 6.1.1.
+
+MailTarget Docs:
+https://github.com/nlog/NLog/wiki/Mail-target
     </PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>NLog;Smtp;SmtpClient;mail;email;logging;log</PackageTags>
@@ -73,7 +81,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="NLog" Version="6.0.3" />
+    <PackageReference Include="NLog" Version="6.1.1" />
   </ItemGroup>
 
   <PropertyGroup>
