@@ -13,6 +13,8 @@ If having trouble with output, then check [NLog InternalLogger](https://github.c
 
 See the [NLog Wiki](https://github.com/NLog/NLog/wiki/Mail-target) for available options and examples.
 
+Note there is also an alternative [NLog.MailKit](https://www.nuget.org/packages/NLog.MailKit)-nuget-package that depends on the MailKit-library.
+
 ## Register Extension
 
 NLog will only recognize type-alias `Mail` when loading from `NLog.config`-file, if having added extension to `NLog.config`-file:
