@@ -31,7 +31,7 @@ Changelog:
 - Update to NLog ver. 6.1.1.
 
 MailTarget Docs:
-https://github.com/nlog/NLog/wiki/Mail-target
+https://github.com/NLog/NLog/wiki/Mail-target
     </PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>NLog;Smtp;SmtpClient;mail;email;logging;log</PackageTags>
