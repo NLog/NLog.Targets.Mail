@@ -15,7 +15,7 @@ See the [NLog Wiki](https://github.com/NLog/NLog/wiki/Mail-target) for available
 
 Note there is also an alternative [NLog.MailKit](https://www.nuget.org/packages/NLog.MailKit)-nuget-package that depends on the MailKit-library.
 
-> ⚠️ Microsoft recommends not to use the SmtpClient class for new development because SmtpClient doesn't support many modern protocols. Use MailKit or other libraries instead. For more information, see [SmtpClient shouldn't be used](https://github.com/dotnet/platform-compat/blob/master/docs/DE0005.md).
+> ⚠️ Microsoft recommends not to use the SmtpClient class for new development because SmtpClient doesn't support many modern protocols. Use MailKit or other libraries instead. For more information, see [SmtpClient shouldn't be used](https://learn.microsoft.com/dotnet/api/system.net.mail.smtpclient#remarks).
 
 ## Register Extension
 
