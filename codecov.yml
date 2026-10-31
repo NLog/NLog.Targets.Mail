@@ -1,0 +1,13 @@
+coverage:
+  range: 60..70
+  status:
+    project:
+      default:
+        target: 70%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+fixes:
+  - "D:/a/NLog.Targets.Mail/NLog.Targets.Mail/::"
+  - "/home/runner/work/NLog.Targets.Mail/NLog.Targets.Mail/::"

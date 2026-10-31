@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore solution
+        run: dotnet restore NLog.Targets.Mail.sln
+      - name: Build solution
+        run: dotnet build NLog.Targets.Mail.sln --configuration Release --no-restore -p:ContinuousIntegrationBuild=true -p:EmbedUntrackedSources=true -p:PublishRepositoryUrl=true
+      - name: Pack solution
+        run: dotnet pack NLog.Targets.Mail.sln --configuration Release --no-build --no-restore -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --output artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+
+  linux-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build netstandard2.1
+        run: dotnet build src/NLog.Targets.Mail/NLog.Targets.Mail.csproj --framework netstandard2.1 --configuration Release
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            framework: net462
+          - os: windows-latest
+            framework: net8.0
+          - os: ubuntu-latest
+            framework: net8.0
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test with coverage
+        if: matrix.framework != 'net462'
+        run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework ${{ matrix.framework }} --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage"
+      - name: Test .NET Framework with coverage
+        if: matrix.framework == 'net462'
+        run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework net462 --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.framework }}
+          path: tests/NLog.Targets.Mail.Tests/TestResults/**/coverage.cobertura.xml
+          if-no-files-found: ignore
+
+  coverage:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage/**/coverage.cobertura.xml
+          fail_ci_if_error: true
