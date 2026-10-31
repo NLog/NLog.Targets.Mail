@@ -71,7 +71,7 @@ jobs:
         with:
           pattern: coverage-*
           path: coverage
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # 7.1.1
         with:
           files: coverage/**/coverage.cobertura.xml
           fail_ci_if_error: true
