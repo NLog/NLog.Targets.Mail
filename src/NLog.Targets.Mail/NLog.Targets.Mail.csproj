@@ -13,8 +13,7 @@
     <Title>NLog.Targets.Mail</Title>
     <Company>NLog</Company>
     <Description>NLog.Targets.Mail for sending emails using the .NET SmtpClient</Description>
-    <Product>NLog.Targets.Mail v$(ProductVersion)</Product>
-    <InformationalVersion>$(ProductVersion)</InformationalVersion>
+    <Product>NLog.Targets.Mail v$(VersionPrefix)</Product>
     <Authors>Jarek Kowalski,Kim Christensen,Julian Verdurmen</Authors>
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
     <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>

@@ -13,25 +13,36 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Restore solution
         run: dotnet restore NLog.Targets.Mail.sln
       - name: Build solution
         run: dotnet build NLog.Targets.Mail.sln --configuration Release --no-restore -p:ContinuousIntegrationBuild=true -p:EmbedUntrackedSources=true -p:PublishRepositoryUrl=true
-      - name: Pack solution
-        run: dotnet pack NLog.Targets.Mail.sln --configuration Release --no-build --no-restore -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --output artifacts
-      - uses: actions/upload-artifact@v4
+
+  create-package:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Create NuGet package
+        run: dotnet pack src/NLog.Targets.Mail/NLog.Targets.Mail.csproj --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+      - uses: actions/upload-artifact@v7
         with:
-          name: nuget-packages
+          name: NuGetPackages
           path: |
             artifacts/*.nupkg
             artifacts/*.snupkg
           if-no-files-found: error
+      - name: Download NuGet package
+        uses: actions/download-artifact@v7
+        with:
+          name: NuGetPackages
+          path: artifacts
 
   linux-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build netstandard2.1
         run: dotnet build src/NLog.Targets.Mail/NLog.Targets.Mail.csproj --framework netstandard2.1 --configuration Release
 
@@ -48,14 +59,14 @@ jobs:
             framework: net8.0
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Test with coverage
         if: matrix.framework != 'net462'
         run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework ${{ matrix.framework }} --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage"
       - name: Test .NET Framework with coverage
         if: matrix.framework == 'net462'
         run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework net462 --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.framework }}
@@ -66,8 +77,8 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
         with:
           pattern: coverage-*
           path: coverage
