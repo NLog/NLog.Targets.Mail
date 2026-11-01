@@ -1,7 +1,8 @@
 # NLog Mail Target
 
 [![Version](https://badge.fury.io/nu/NLog.Targets.Mail.svg)](https://www.nuget.org/packages/NLog.Targets.Mail)
-[![AppVeyor](https://img.shields.io/appveyor/ci/NLog/NLog-Targets-Mail/master.svg)](https://ci.appveyor.com/project/nlog/NLog-Targets-Mail/branch/master)
+[![CI](https://github.com/NLog/NLog.Targets.Mail/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/NLog/NLog.Targets.Mail/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/NLog/NLog.Targets.Mail/graph/badge.svg?token=EJD7UG230N)](https://codecov.io/gh/NLog/NLog.Targets.Mail)
 
 NLog Mail Target for sending email using .NET SmtpClient for each logevent.
 - Combine with [FallbackGroup](https://github.com/NLog/NLog/wiki/FallbackGroup-target) to fallback to alternative SMTP-server on error.
