@@ -20,12 +20,7 @@
 
     <PackageReleaseNotes>
 Changelog:
-- First release after extracting to own git repository.
-- Improved upfront validation of configured email addresses (To / From / Cc / Bcc)
-- Improved exception handling when one or more configured email addresses are not valid.
-- Improved Assembly Title to include target framework details.
-- Updated nuget-package README.md to include more links to wiki-documentation.
-- Update to NLog ver. 6.1.1.
+- Updated NLog to 6.2.2
 
 MailTarget Docs:
 https://github.com/NLog/NLog/wiki/Mail-target
@@ -77,7 +72,7 @@ https://github.com/NLog/NLog/wiki/Mail-target
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.1.1" />
+    <PackageReference Include="NLog" Version="6.2.2" />
   </ItemGroup>
 
   <PropertyGroup>
