@@ -2,81 +2,135 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   pull_request:
-    branches: [master]
+  workflow_dispatch:
+    inputs:
+      force_nuget_publish:
+        description: Force NuGet publish # for non-master. The package version gets a suffix. See Create NuGet Package step
+        type: boolean
+        default: false
 
-permissions:
-  contents: read
+env:
+  SOLUTION: NLog.Targets.Mail.sln
+  TEST_PROJECT: tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj
 
 jobs:
-  windows:
-    name: Build & test (Windows)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Restore solution
-        run: dotnet restore NLog.Targets.Mail.sln
-      - name: Build solution
-        run: dotnet build NLog.Targets.Mail.sln --configuration Release --no-restore -p:ContinuousIntegrationBuild=true -p:EmbedUntrackedSources=true -p:PublishRepositoryUrl=true
-      - name: Test .NET Framework with coverage
-        run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework net462 --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
-      - name: Test .NET with coverage
-        run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework net8.0 --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage"
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: coverage-windows
-          path: tests/NLog.Targets.Mail.Tests/TestResults/**/coverage.cobertura.xml
-          if-no-files-found: ignore
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            name: Build & test (Windows)
+            build_project: NLog.Targets.Mail.sln
+            build_framework_args:
+            test_framework_args:
+            coverage_args:
+            upload_coverage: false
+            aot_test_runtime: win-x64
+          - os: ubuntu-latest
+            name: Build & test (Ubuntu)
+            build_project: tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj
+            build_framework_args: --framework net8.0
+            test_framework_args: --framework net8.0
+            coverage_args: --collect:"XPlat Code Coverage"
+            upload_coverage: true
+            aot_test_runtime: linux-x64
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
 
-  ubuntu:
-    name: Build & test (Ubuntu)
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Build netstandard2.1
-        run: dotnet build src/NLog.Targets.Mail/NLog.Targets.Mail.csproj --framework netstandard2.1 --configuration Release
-      - name: Test .NET with coverage
-        run: dotnet test tests/NLog.Targets.Mail.Tests/NLog.Targets.Mail.Tests.csproj --framework net8.0 --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage"
-      - uses: actions/upload-artifact@v7
-        if: always()
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ matrix.build_project }} --configuration Release --no-restore ${{ matrix.build_framework_args }}
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} --configuration Release --no-restore --no-build ${{ matrix.test_framework_args }} ${{ matrix.coverage_args }} --logger GitHubActions
+
+      - name: Upload coverage to Codecov
+        if: matrix.upload_coverage
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # https://github.com/codecov/codecov-action/releases/tag/v7.1.1
         with:
-          name: coverage-ubuntu
-          path: tests/NLog.Targets.Mail.Tests/TestResults/**/coverage.cobertura.xml
-          if-no-files-found: ignore
+          token: ${{ secrets.CODECOV_TOKEN }} # Needed for protected branches
+          files: tests/**/TestResults/**/coverage.cobertura.xml
+          fail_ci_if_error: true
 
   pack:
     name: Create NuGet package
-    needs: [windows, ubuntu]
     runs-on: windows-latest
+    permissions:
+      contents: read
+
     steps:
       - uses: actions/checkout@v7
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Determine version suffix
+        id: version
+        shell: pwsh
+        env:
+          REF: ${{ github.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if ($env:REF -eq "refs/heads/master") {
+            echo "suffix=" >> $env:GITHUB_OUTPUT
+          } elseif ($env:PR_NUMBER) {
+            echo "suffix=pr.$($env:PR_NUMBER).ci.$($env:RUN_NUMBER)" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "suffix=ci.$($env:RUN_NUMBER)" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Create NuGet package
-        run: dotnet pack src/NLog.Targets.Mail/NLog.Targets.Mail.csproj --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
-      - uses: actions/upload-artifact@v7
+        shell: pwsh
+        env:
+          VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
+        run: dotnet pack $env:SOLUTION --no-restore --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:EmbedUntrackedSources=true -p:ContinuousIntegrationBuild=true --version-suffix "$env:VERSION_SUFFIX"
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v7
         with:
           name: NuGetPackages
           path: |
             artifacts/*.nupkg
             artifacts/*.snupkg
           if-no-files-found: error
+
+  publish:
+    name: Publish NuGet package
+    needs: [build, pack]
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && inputs.force_nuget_publish)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
       - name: Download NuGet package
         uses: actions/download-artifact@v7
         with:
           name: NuGetPackages
           path: artifacts
 
-  coverage:
-    needs: [windows, ubuntu]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v7
+      - name: NuGet login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2
+        id: login
         with:
-          pattern: coverage-*
-          path: coverage
-      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # 7.1.1
-        with:
-          files: coverage/**/coverage.cobertura.xml
-          fail_ci_if_error: true
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
